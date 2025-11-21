@@ -16,5 +16,6 @@ THIRD_PARTY_APPS = [
 
 
 SELF_APPS = [
-    # "apps.novels",
+    "apps.analytics",
+    "apps.events",
 ]
