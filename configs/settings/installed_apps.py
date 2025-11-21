@@ -17,5 +17,6 @@ THIRD_PARTY_APPS = [
 
 SELF_APPS = [
     "apps.analytics",
+    "apps.common",
     "apps.events",
 ]
