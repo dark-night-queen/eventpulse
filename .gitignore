@@ -9,7 +9,7 @@ wheels/
 
 # Django media/static files
 /media
-/staticfiles
+/static-files
 /static
 
 

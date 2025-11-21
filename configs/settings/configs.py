@@ -11,7 +11,7 @@ ENV_FILE_CONFIG = {
 class Configurations(BaseSettings):
     model_config = SettingsConfigDict(**ENV_FILE_CONFIG)
 
-    BASE_DIR: Path = Path(__file__).resolve().parent.parent
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY: str
     # SECURITY WARNING: don't run with debug turned on in production!
