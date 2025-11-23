@@ -83,6 +83,62 @@
   }
   ```
 
+- Now, we want to produce & consume events using a python script running on local machine.
+
+  - However, there is an issue. Initially, we have written this code within docker-compose.yml
+
+    ```yml
+    services:
+        redpanda:
+            ...
+            command:
+                ...
+                - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+                - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+
+        redpanda-console:
+            ...
+            environment:
+                - KAFKA_BROKERS=redpanda:9092
+    ```
+
+  - And used this address within the script file
+
+    ```py
+    p = Producer({"bootstrap.servers": "localhost:9092"})
+    ```
+
+  - But the problem was the host was unable resolve `redpanda:9092` to `localhost:9092`, b/c localhost is not binded to redpanda.
+
+  - So, we updated `--advertise-kafka-addr=PLAINTEXT://redpanda:9092` to `--advertise-kafka-addr=PLAINTEXT://localhost:9092`.
+
+  - However, Inside Docker, `localhost:9092` → means inside the container, not your host. So Redpanda advertises itself as unreachable to its own clients inside the network. (Error in accessing msgs in redpanda-console's topic).
+
+  - Hence, we needed two different addresses,
+
+    1. For host machine (external entity) -> `localhost:9092`.
+    2. For other containers (internal entity) -> `redpanda:29092`.
+
+  - The new config becomes:
+
+    ```yml
+    services:
+        redpanda:
+            ...
+            command:
+                ...
+                # LISTENERS
+                - --kafka-addr=PLAINTEXT://0.0.0.0:9092,INSIDE://0.0.0.0:29092
+
+                # ADVERTISED (what clients should use)
+                - --advertise-kafka-addr=PLAINTEXT://localhost:9092,INSIDE://redpanda:29092
+
+        redpanda-console:
+            ...
+            environment:
+                - KAFKA_BROKERS=redpanda:29092
+    ```
+
 ---
 
 ## Django Readme

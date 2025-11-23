@@ -20,8 +20,10 @@ services:
       - --reserve-memory=0M
       - --node-id=0
       - --check=false
-      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
-      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+      # LISTENERS
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092,INSIDE://0.0.0.0:29092
+      # ADVERTISED (what clients should use)
+      - --advertise-kafka-addr=PLAINTEXT://localhost:9092,INSIDE://redpanda:29092
     volumes:
       - redpanda-data:/var/lib/redpanda/data
 
@@ -33,7 +35,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - KAFKA_BROKERS=redpanda:9092
+      - KAFKA_BROKERS=redpanda:29092
     depends_on:
       - redpanda
 
@@ -45,17 +47,17 @@ services:
       - redpanda
     entrypoint: ["/bin/sh", "-c"]
     command:
-      # Wait for broker to be ready (docker exec -it redpanda rpk cluster info --brokers=redpanda:9092 for checks)
+      # Wait for broker to be ready
       - |
         echo "Waiting for Redpanda..."
-        until rpk cluster info --brokers=redpanda:9092 >/dev/null 2>&1; do
+        until rpk cluster info --brokers=redpanda:29092 >/dev/null 2>&1; do
           sleep 1
         done
 
         echo "Creating topics..."
-        rpk topic create events -X brokers=redpanda:9092 || true
-        rpk topic create logs -X brokers=redpanda:9092 || true
-        rpk topic create metrics -X brokers=redpanda:9092 || true
+        rpk topic create events -X brokers=redpanda:29092 || true
+        rpk topic create logs -X brokers=redpanda:29092 || true
+        rpk topic create metrics -X brokers=redpanda:29092 || true
 
         echo "Kafka topics created ✔"
 
