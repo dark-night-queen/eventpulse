@@ -1,0 +1,63 @@
+networks:
+  eventpulse-net:
+    external: true
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: redpanda
+    networks:
+      - eventpulse-net
+    ports:
+      - "9092:9092" # Kafka API
+      - "9644:9644" # Admin API
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+
+  redpanda-console:
+    image: redpandadata/console:latest
+    container_name: redpanda-console
+    networks:
+      - eventpulse-net
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_BROKERS=redpanda:9092
+    depends_on:
+      - redpanda
+
+  redpanda-init:
+    image: redpandadata/redpanda:latest
+    networks:
+      - eventpulse-net
+    depends_on:
+      - redpanda
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      # Wait for broker to be ready (docker exec -it redpanda rpk cluster info --brokers=redpanda:9092 for checks)
+      - |
+        echo "Waiting for Redpanda..."
+        until rpk cluster info --brokers=redpanda:9092 >/dev/null 2>&1; do
+          sleep 1
+        done
+
+        echo "Creating topics..."
+        rpk topic create events -X brokers=redpanda:9092 || true
+        rpk topic create logs -X brokers=redpanda:9092 || true
+        rpk topic create metrics -X brokers=redpanda:9092 || true
+
+        echo "Kafka topics created ✔"
+
+volumes:
+  redpanda-data:
