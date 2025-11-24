@@ -7,6 +7,14 @@ from configs.settings import KAFKA_BOOTSTRAP_SERVERS
 
 
 class KafkaProducer:
+    """
+    Design Pattern: Facade
+        This gives you:
+        - a clean API (send_message(...))
+        - decoupling from the Confluent client
+        - easier swapping (e.g., Redpanda → Kafka cluster → mock producer)
+    """
+
     def __init__(self, bootstrap_servers: str = KAFKA_BOOTSTRAP_SERVERS):
         self.producer = Producer({"bootstrap.servers": bootstrap_servers})
 
