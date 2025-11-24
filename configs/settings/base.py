@@ -21,6 +21,8 @@ ALLOWED_HOSTS = configurations.ALLOWED_HOSTS
 # Application definition
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + SELF_APPS
 
+
+# Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -34,6 +36,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "configs.urls"
 
+
+# Admin Templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -54,7 +58,6 @@ WSGI_APPLICATION = "configs.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 
 DATABASES = {
     "default": {
@@ -106,7 +109,12 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static-files/")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Kafka Settings
+KAFKA_BOOTSTRAP_SERVERS = configurations.KAFKA_BOOTSTRAP_SERVERS

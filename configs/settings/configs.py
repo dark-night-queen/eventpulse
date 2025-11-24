@@ -18,6 +18,9 @@ class Configurations(BaseSettings):
     DEBUG: bool = False
     ALLOWED_HOSTS: list = ["*"]
 
+    # Kafka Settings
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+
 
 configurations = Configurations()
 

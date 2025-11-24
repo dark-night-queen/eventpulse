@@ -12,6 +12,12 @@
   >> docker compose down -v
   ```
 
+- To do both in one command
+
+  ```sh
+  >> docker compose down -v && up
+  ```
+
 - To check the cluster info + brokers + topics:
 
   ```sh
@@ -32,6 +38,21 @@
 
   TOPICS
   ======
+  NAME     PARTITIONS  REPLICAS
+  events   1           1
+  logs     1           1
+  metrics  1           1
+  ```
+
+  ---
+
+  ```sh
+  >> docker exec -it redpanda rpk topic list
+  ```
+
+  Output:
+
+  ```sh
   NAME     PARTITIONS  REPLICAS
   events   1           1
   logs     1           1
@@ -153,3 +174,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 Quick-start development settings - unsuitable for production, see
 https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+
+
+---
+
+## Django + Kafka
+
+> Why confluent-kafka?
+*It’s native C-based, super fast, and the most used in production.*
