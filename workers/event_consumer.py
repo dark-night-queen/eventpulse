@@ -1,5 +1,6 @@
 # Standard Library imports
 import time
+from loguru import logger
 
 # App imports
 from apps.common.kafka.consumer import KafkaConsumer
@@ -10,10 +11,16 @@ consumer = KafkaConsumer(
     topics=["events"],
 )
 
-print("Listening for events...")
+logger.info("Listening for events...")
 
-while True:
-    msg = consumer.poll_message()
-    if msg:
-        print("Received:", msg)
-    time.sleep(0.1)
+try:
+    while True:
+        msg = consumer.poll_message()
+        if msg:
+            logger.info(f"Received: {msg}")
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    logger.warning("Shutting down consumer...")
+finally:
+    consumer.close()
+    logger.info("Consumer closed.")
