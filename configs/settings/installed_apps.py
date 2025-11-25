@@ -19,4 +19,5 @@ SELF_APPS = [
     "apps.analytics",
     "apps.common",
     "apps.events",
+    "apps.teams"
 ]
