@@ -1,26 +1,29 @@
 # Standard Library imports
-import time
 from loguru import logger
 
 # App imports
 from apps.common.kafka.consumer import KafkaConsumer
+from workers.base_consumer import BaseWorker
 
 
-consumer = KafkaConsumer(
-    group_id="test-group",
-    topics=["events"],
-)
+class EventConsumerWorker(BaseWorker):
+    group_id: str = "test-group"
+    topics: list[str] = ["events"]
 
-logger.info("Listening for events...")
+    def setup(self):
+        self.consumer = KafkaConsumer(self.group_id, self.topics)
+        logger.info("Listening for events...")
 
-try:
-    while True:
-        msg = consumer.poll_message()
+    def process(self):
+        msg = self.consumer.poll_message()
         if msg:
             logger.info(f"Received: {msg}")
-        time.sleep(0.1)
-except KeyboardInterrupt:
-    logger.warning("Shutting down consumer...")
-finally:
-    consumer.close()
-    logger.info("Consumer closed.")
+
+    def cleanup(self):
+        self.consumer.close()
+        logger.info("Kafka consumer closed.")
+
+
+if __name__ == "__main__":
+    consumer = EventConsumerWorker()
+    consumer.run()
